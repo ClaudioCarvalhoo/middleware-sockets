@@ -13,7 +13,7 @@ import (
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("1. Start TCP Server\n2. Start TCP Client\n3. Start UDP Server\n4. Start UPD Client")
+	fmt.Println("+-------------------+\n|--------TCP--------|\n+-------------------+\n|1. Start TCP Server|\n|2. Start TCP Client|\n+-------------------+\n\n+-------------------+\n|--------UDP--------|\n+-------------------+\n|3. Start UDP Server|\n|4. Start UPD Client|\n+-------------------+")
 	fmt.Print("-> ")
 	input, _ := reader.ReadString('\n')
 	input = util.TrimString(input)
