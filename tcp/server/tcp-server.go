@@ -1,6 +1,6 @@
 package server
 
-import(
+import (
 	"bufio"
 	"fmt"
 	"net"
@@ -38,14 +38,11 @@ func StartServer() {
 
 // Handles incoming requests.
 func handleRequest(conn net.Conn) {
-	b := bufio.NewReader(conn)
-	bytes, err := b.ReadBytes('\n')
-	text := strings.TrimRight(string(bytes), "\n")
-	if err != nil { // EOF, or worse
-		os.Exit(1)
+	defer conn.Close()
+	for {
+		message, _ := bufio.NewReader(conn).ReadString('\n')
+		fmt.Println("Message Received:", message)
+		newMessage := strings.ToUpper(message)
+		conn.Write([]byte(newMessage + "\n"))
 	}
-	// Send a response back to person contacting us.
-	conn.Write([]byte(text))
-	// Close the connection when you're done with it.
-	conn.Close()
 }
