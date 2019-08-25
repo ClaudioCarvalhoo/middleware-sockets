@@ -28,17 +28,17 @@ func StartClient() {
 		if text == "exit" {
 			return
 		}
-		fmt.Fprintf(conn, text+"\n")
+		conn.Write([]byte(text))
 
 		buffer := make([]byte, 1024)
-		conn.SetWriteDeadline(time.Now().Add(1 * time.Second))
-		size, addr, err := conn.ReadFrom(buffer)
+		err = conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+		size, receiveAddr, err := conn.ReadFrom(buffer)
 		if err != nil {
 			fmt.Println("só deus sabe")
 			return
 		}
 
 		received := util.TrimString(string(buffer[:size]))
-		fmt.Printf("Message from server in %s: %s\n", addr, received)
+		fmt.Printf("Message from server in %s: %s\n", receiveAddr, received)
 	}
 }

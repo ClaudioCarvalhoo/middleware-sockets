@@ -21,28 +21,38 @@ func StartServer() {
 	defer conn.Close()
 	fmt.Println("Listening on " + "address")
 
-	buffer := make([]byte, 1024)
-	go func() {
-		for {
-			size, addr, err := conn.ReadFromUDP(buffer)
-			if err != nil {
-				fmt.Println("disconnected?")
-				return
-			}
+	ips := make(map[string]int)
+	new := 1
 
-			text := util.TrimString(string(buffer[:size]))
-
-			fmt.Printf("Message Received from %s: %s\n", addr, text)
-			text = strings.ToUpper(text)
-
-			conn.SetWriteDeadline(time.Now().Add(1 * time.Second))
-			_, err = conn.WriteTo([]byte(text), addr)
-			if err != nil {
-				fmt.Println("disconnected?")
-				return
-			}
+	for {
+		buffer := make([]byte, 1024)
+		//Joga entrada no buffer
+		size, addr, err := conn.ReadFromUDP(buffer)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
-	}()
+		id, ok := ips[addr.String()]
+		if !ok {
+			id = new
+			ips[addr.String()] = id
+			new++
+		}
+		go handleConnection(conn, buffer, size, addr, id)
+	}
+}
 
-	time.Sleep(2 * time.Hour)
+func handleConnection(conn *net.UDPConn, buffer []byte, size int, addr *net.UDPAddr, id int) {
+	//Lê do buffer
+	text := util.TrimString(string(buffer[:size]))
+
+	fmt.Printf("Message Received from #%d: %s\n", id, text)
+	text = strings.ToUpper(text)
+
+	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	_, err := conn.WriteTo([]byte(text), addr)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
