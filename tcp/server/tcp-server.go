@@ -3,50 +3,43 @@ package server
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"middleware-sockets/util"
 	"net"
 	"os"
 	"strings"
 )
 
-const (
-	CONN_HOST = "localhost"
-	CONN_PORT = "7474"
-	CONN_TYPE = "tcp"
-)
+const address = "localhost:7474"
 
 func StartServer() {
-	// Listen for incoming connections.
-	l, err := net.Listen(CONN_TYPE, CONN_HOST+":"+CONN_PORT)
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
 	}
+	defer listener.Close()
+	fmt.Println("Listening on " + address)
+
 	id := 1
-	// Close the listener when the application closes.
-	defer l.Close()
-	fmt.Println("Listening on " + CONN_HOST + ":" + CONN_PORT)
 	for {
-		// Listen for an incoming connection.
-		conn, err := l.Accept()
+		conn, err := listener.Accept()
 		if err != nil {
 			fmt.Println("Error accepting: ", err.Error())
 			os.Exit(1)
 		}
 		fmt.Printf("Accepted connection #%d\n", id)
-		// Handle connections in a new goroutine.
-		go handleRequest(conn, id)
+		go handleConnection(conn, id)
 		id++
 	}
 }
 
-// Handles incoming requests.
-func handleRequest(conn net.Conn, id int) {
+func handleConnection(conn net.Conn, id int) {
 	defer conn.Close()
 	for {
 		message, err := bufio.NewReader(conn).ReadString('\n')
 		message = util.TrimString(message)
-		if err != nil {
+		if err == io.EOF {
 			fmt.Printf("Connection #%d disconnected\n", id)
 			return
 		}

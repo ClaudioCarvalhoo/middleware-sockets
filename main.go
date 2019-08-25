@@ -17,13 +17,13 @@ func main() {
 	input = util.TrimString(input)
 	if input == "1" {
 		tcpServer.StartServer()
-	}else if input == "2" {
+	} else if input == "2" {
 		tcpClient.StartClient()
-	}else if input == "3" {
+	} else if input == "3" {
 		fmt.Println("TODO: Start UDP Server")
-	}else if input == "4" {
+	} else if input == "4" {
 		fmt.Println("TODO: Start UDP Client")
-	}else {
+	} else {
 		fmt.Println("Invalid")
 	}
 }

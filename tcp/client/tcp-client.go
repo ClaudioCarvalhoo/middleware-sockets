@@ -8,12 +8,12 @@ import (
 	"os"
 )
 
+const address = "localhost:7474"
+
 func StartClient() {
-	// connect to this socket
-	conn, _ := net.Dial("tcp", "localhost:7474")
+	conn, _ := net.Dial("tcp", address)
 	defer conn.Close()
 	for {
-		// read in input from stdin
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Print("Text to send: ")
 		text, _ := reader.ReadString('\n')
@@ -21,11 +21,10 @@ func StartClient() {
 		if text == "exit" {
 			return
 		}
-		// send to socket
-		fmt.Fprintf(conn, text + "\n")
-		// listen for reply
+		fmt.Fprintf(conn, text+"\n")
+
 		message, _ := bufio.NewReader(conn).ReadString('\n')
 		message = util.TrimString(message)
-		fmt.Println("Message from server: "+ message)
+		fmt.Println("Message from server: " + message)
 	}
 }
