@@ -3,6 +3,7 @@ package server
 import (
 	"bufio"
 	"fmt"
+	"middleware-sockets/util"
 	"net"
 	"os"
 	"strings"
@@ -21,6 +22,7 @@ func StartServer() {
 		fmt.Println("Error listening:", err.Error())
 		os.Exit(1)
 	}
+	id := 1
 	// Close the listener when the application closes.
 	defer l.Close()
 	fmt.Println("Listening on " + CONN_HOST + ":" + CONN_PORT)
@@ -31,16 +33,23 @@ func StartServer() {
 			fmt.Println("Error accepting: ", err.Error())
 			os.Exit(1)
 		}
+		fmt.Printf("Accepted connection #%d\n", id)
 		// Handle connections in a new goroutine.
-		go handleRequest(conn)
+		go handleRequest(conn, id)
+		id++
 	}
 }
 
 // Handles incoming requests.
-func handleRequest(conn net.Conn) {
+func handleRequest(conn net.Conn, id int) {
 	defer conn.Close()
 	for {
-		message, _ := bufio.NewReader(conn).ReadString('\n')
+		message, err := bufio.NewReader(conn).ReadString('\n')
+		message = util.TrimString(message)
+		if err != nil {
+			fmt.Printf("Connection #%d disconnected\n", id)
+			return
+		}
 		fmt.Println("Message Received:", message)
 		newMessage := strings.ToUpper(message)
 		conn.Write([]byte(newMessage + "\n"))
