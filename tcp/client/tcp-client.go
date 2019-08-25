@@ -7,7 +7,7 @@ import "os"
 
 func StartClient() {
 	// connect to this socket
-	conn, _ := net.Dial("tcp", "localhost:3333")
+	conn, _ := net.Dial("tcp", "localhost:7474")
 	for {
 		// read in input from stdin
 		reader := bufio.NewReader(os.Stdin)
@@ -17,6 +17,6 @@ func StartClient() {
 		fmt.Fprintf(conn, text + "\n")
 		// listen for reply
 		message, _ := bufio.NewReader(conn).ReadString('\n')
-		fmt.Println("Message from server: "+message)
+		fmt.Println("Message from server: "+ message)
 	}
 }
