@@ -5,6 +5,8 @@ import (
 	"fmt"
 	tcpClient "middleware-sockets/tcp/client"
 	tcpServer "middleware-sockets/tcp/server"
+	udpClient "middleware-sockets/udp/client"
+	udpServer "middleware-sockets/udp/server"
 	"middleware-sockets/util"
 	"os"
 )
@@ -20,9 +22,9 @@ func main() {
 	} else if input == "2" {
 		tcpClient.StartClient()
 	} else if input == "3" {
-		fmt.Println("TODO: Start UDP Server")
+		udpServer.StartServer()
 	} else if input == "4" {
-		fmt.Println("TODO: Start UDP Client")
+		udpClient.StartClient()
 	} else {
 		fmt.Println("Invalid")
 	}
