@@ -5,8 +5,8 @@ import (
 	"fmt"
 	tcpClient "middleware-sockets/tcp/client"
 	tcpServer "middleware-sockets/tcp/server"
+	"middleware-sockets/util"
 	"os"
-	"strings"
 )
 
 func main() {
@@ -14,8 +14,7 @@ func main() {
 	fmt.Println("1. Start TCP Server\n2. Start TCP Client\n3. Start UDP Server\n4. Start UPD Client")
 	fmt.Print("-> ")
 	input, _ := reader.ReadString('\n')
-	input = strings.TrimRight(input, "\n")
-	input = strings.TrimRight(input, "\r\n")
+	input = util.TrimString(input)
 	if input == "1" {
 		tcpServer.StartServer()
 	}else if input == "2" {
