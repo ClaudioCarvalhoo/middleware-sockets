@@ -55,7 +55,6 @@ func main() {
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
 			err = ch.Publish(
 				"",     // exchange
 				cq.Name, // routing key

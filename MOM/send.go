@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"time"
 	"strings"
+	"math"
+	"fmt"
 )
 
 func failOnError(err error, msg string) {
@@ -14,10 +16,13 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func printTimes(times []int){
-	for i:= range times{
-		log.Printf(strconv.Itoa(times[i]))
-	}
+func StdDev(numbers []float64, mean float64) float64 {
+    total := 0.0
+    for _, number := range numbers {
+        total += math.Pow(number-mean, 2)
+    }
+    variance := total / float64(len(numbers)-1)
+    return math.Sqrt(variance)
 }
 
 func main() {
@@ -61,21 +66,21 @@ func main() {
 	failOnError(cerr, "Failed to register a consumer")
 
 	times := make([]int, 10000)
+	timesFloated := make([]float64, 10000)
 	forever := make(chan bool)
 	i := 0
 
 	go func() {
 		for d := range msgs {
-			log.Printf("Received a message: %s", d.Body)
 			s1 :=  strings.Split(string(d.Body), "..")
 			t, err := strconv.Atoi(s1[0])
 			n, err := strconv.Atoi(s1[1])
 			if err == nil {
 			}		
 			times[n] = int(time.Now().UTC().UnixNano()) - t
+			timesFloated[n] = float64(float64(time.Now().UTC().UnixNano()) - float64(t))
 			i++
 			if (i >= 9999){
-				printTimes(times)
 				forever <- false
 			}
 		}
@@ -94,8 +99,19 @@ func main() {
 				Body:        []byte(body),
 			})
 		failOnError(serr, "Failed to publish a message")
-		log.Printf(" [x] Sent %s", body)
 	}
 
 	<- forever
+	sum := 0
+	for i:=range times{
+		sum += times[i]
+	}
+	mean := sum / 10000
+	std := StdDev(timesFloated, float64(mean))
+	fmt.Print("Mean: ")
+	fmt.Print(mean)
+	fmt.Println(" nanoseconds")
+	fmt.Print("Stdev: ")
+	fmt.Print(std)
+	fmt.Println(" nanoseconds")
 }
